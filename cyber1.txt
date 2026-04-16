@@ -1,1 +1,12 @@
 //neu xua tung noi neu luc minh giau
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST["name"];
+    echo "Hello, " . htmlspecialchars($name) . "!";
+}
+?>
+
+<form method="post">
+    <input type="text" name="name" placeholder="Enter your name">
+    <button type="submit">Submit</button>
+</form>
