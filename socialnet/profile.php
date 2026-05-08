@@ -71,12 +71,16 @@ $user = $result->fetch_assoc();
             color: #0077b6;
         }
 
-        .profile-content {
+	.profile-content {
+
             background: #f0fbff;
             padding: 18px;
             border-radius: 10px;
             min-height: 100px;
-            border-left: 5px solid #00a8e8;
+	    border-left: 5px solid #00a8e8;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            overflow: hidden;
         }
     </style>
 </head>
