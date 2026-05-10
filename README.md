@@ -12,7 +12,7 @@
 
 +Import the db.sql file to create the users database and the account table:
 ```
-mysql -u root -p < db.sql
+sudo mysql -u root -p < db.sql
 ```
 +open db.php to update the database information to match your own environment.
 ```
