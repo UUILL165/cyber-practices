@@ -81,8 +81,15 @@ $user = $result->fetch_assoc();
             max-width: 100%;
             overflow-wrap: break-word;
             overflow: hidden;
-        }
-    </style>
+	}
+        
+        .profile-content img {
+            max-width: 100%;
+            height: auto;
+	    border-radius: 10px;
+	}
+</style>
+
 </head>
 <body>
 
