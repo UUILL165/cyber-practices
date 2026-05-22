@@ -14,30 +14,31 @@ if (!isset($_SESSION["user_id"])) {
     exit();
 }
 
-$user_id = $_SESSION["user_id"];
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $description = $_POST["description"];
-    $target = $_POST["target"];
-    $sql = "UPDATE account SET description = '$description' WHERE username = '$target'";
+    $target_user_id = $_POST["user_id"];
+    $new_password = $_POST["new_password"];
 
-    if ($conn->query($sql)) {
-        $message = "Profile content updated.";
+    if ($new_password === "") {
+        $message = "New password cannot be empty.";
     } else {
-        $message = "Update failed: " . $conn->error;
+        $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+        $sql = "UPDATE account SET password = '$hashed' WHERE id = $target_user_id";
+
+        if ($conn->query($sql)) {
+            $message = "Password changed.";
+        } else {
+            $message = "Password change failed: " . $conn->error;
+        }
     }
 }
-
-$sql = "SELECT description FROM account WHERE id = $user_id";
-$result = $conn->query($sql);
-$user = $result->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Setting</title>
+    <title>Change Password</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,7 +60,7 @@ $user = $result->fetch_assoc();
         }
 
         .container {
-            width: 650px;
+            width: 500px;
             margin: 50px auto;
             background: white;
             padding: 30px;
@@ -71,20 +72,16 @@ $user = $result->fetch_assoc();
             color: #0077b6;
         }
 
-        input, textarea {
+        input {
             width: 100%;
             padding: 12px;
             border: 1px solid #90e0ef;
             border-radius: 8px;
             box-sizing: border-box;
-        }
-
-        textarea {
-            height: 180px;
+            margin-bottom: 16px;
         }
 
         button {
-            margin-top: 15px;
             padding: 12px 18px;
             background: #00a8e8;
             color: white;
@@ -111,20 +108,19 @@ $user = $result->fetch_assoc();
 <?php include "menubar.php"; ?>
 
 <div class="container">
-    <h1>Setting Page</h1>
+    <h1>Change Password</h1>
 
     <p class="message"><?php echo htmlspecialchars($message); ?></p>
 
     <form method="POST">
-        <label>Target username:</label><br>
-        <input type="text" name="target" value="<?php echo htmlspecialchars($_SESSION["username"]); ?>">
-        <p class="hint">Vulnerable lab field. Changing this allows updating another user's profile.</p>
+        <label>Target user ID:</label><br>
+        <input type="text" name="user_id" value="<?php echo htmlspecialchars($_SESSION["user_id"]); ?>">
+        <p class="hint">Vulnerable lab field. Changing this allows password changes for another account.</p>
 
-        <label>Edit Profile Page Content:</label><br><br>
-        <textarea name="description"><?php echo htmlspecialchars($user["description"]); ?></textarea>
+        <label>New password:</label><br>
+        <input type="password" name="new_password">
 
-        <br>
-        <button type="submit">Save</button>
+        <button type="submit">Change Password</button>
     </form>
 </div>
 

@@ -1,4 +1,11 @@
 <?php
+ini_set("session.use_strict_mode", 0);
+ini_set("session.use_only_cookies", 0);
+ini_set("session.use_trans_sid", 1);
+ini_set("session.cookie_httponly", 0);
+ini_set("session.cookie_secure", 0);
+ini_set("session.cookie_samesite", "");
+
 session_start();
 include "db.php";
 
@@ -7,15 +14,10 @@ $message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"]);
     $password = $_POST["password"];
+    $sql = "SELECT * FROM account WHERE username = '$username'";
+    $result = $conn->query($sql);
 
-    $sql = "SELECT * FROM account WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-
-    if ($result->num_rows == 1) {
+    if ($result && $result->num_rows >= 1) {
         $user = $result->fetch_assoc();
 
         if (password_verify($password, $user["password"])) {

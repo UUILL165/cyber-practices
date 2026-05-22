@@ -1,4 +1,9 @@
 <?php
+// Weak cookie settings
+ini_set("session.cookie_httponly", 0);
+ini_set("session.cookie_secure", 0);
+ini_set("session.cookie_samesite", "");
+
 session_start();
 include "db.php";
 
@@ -12,23 +17,16 @@ if (!isset($_SESSION["user_id"])) {
 
 if (isset($_GET["owner"])) {
     $owner = $_GET["owner"];
-
-    $sql = "SELECT username, fullname, description FROM account WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $owner);
+    $sql = "SELECT username, fullname, description FROM account WHERE username = '$owner'";
+    $result = $conn->query($sql);
 } else {
     $user_id = $_SESSION["user_id"];
-
-    $sql = "SELECT username, fullname, description FROM account WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $user_id);
+    $sql = "SELECT username, fullname, description FROM account WHERE id = $user_id";
+    $result = $conn->query($sql);
 }
 
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows == 0) {
-    die("Profile owner not found.");
+if (!$result || $result->num_rows == 0) {
+    die("Profile owner not found. SQL error: " . $conn->error);
 }
 
 $user = $result->fetch_assoc();
@@ -71,25 +69,23 @@ $user = $result->fetch_assoc();
             color: #0077b6;
         }
 
-	.profile-content {
-
+        .profile-content {
             background: #f0fbff;
             padding: 18px;
             border-radius: 10px;
             min-height: 100px;
-	    border-left: 5px solid #00a8e8;
+            border-left: 5px solid #00a8e8;
             max-width: 100%;
             overflow-wrap: break-word;
             overflow: hidden;
-	}
-        
+        }
+
         .profile-content img {
             max-width: 100%;
             height: auto;
-	    border-radius: 10px;
-	}
-</style>
-
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -113,6 +109,5 @@ $user = $result->fetch_assoc();
         ?>
     </div>
 </div>
-
 </body>
 </html>

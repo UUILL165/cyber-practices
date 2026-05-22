@@ -1,4 +1,9 @@
 <?php
+//Weak cookie settings.
+ini_set("session.cookie_httponly", 0);
+ini_set("session.cookie_secure", 0);
+ini_set("session.cookie_samesite", "");
+
 session_start();
 include "db.php";
 
@@ -101,6 +106,7 @@ $result = $stmt->get_result();
 <div class="container">
     <h1>Home Page</h1>
     <h2>Your Information</h2>
+    <p><strong>User ID:</strong> <?php echo htmlspecialchars($_SESSION["user_id"]); ?></p>
     <p><strong>Username:</strong> <?php echo htmlspecialchars($_SESSION["username"]); ?></p>
     <p><strong>Full name:</strong> <?php echo htmlspecialchars($_SESSION["fullname"]); ?></p>
 
