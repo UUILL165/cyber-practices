@@ -33,6 +33,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_account"])) {
+    $target_user_id = $_POST["user_id"];
+    $sql = "DELETE FROM account WHERE id = $target_user_id";
+
+    if ($conn->query($sql)) {
+        session_destroy();
+        header("Location: signin.php");
+        exit();
+    } else {
+        $message = "Delete failed: " . $conn->error;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -96,11 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .message {
             color: green;
         }
-
-        .hint {
-            color: #555;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -113,9 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <p class="message"><?php echo htmlspecialchars($message); ?></p>
 
     <form method="POST">
-        <label>Target user ID:</label><br>
-        <input type="text" name="user_id" value="<?php echo htmlspecialchars($_SESSION["user_id"]); ?>">
-        <p class="hint">Vulnerable lab field. Changing this allows password changes for another account.</p>
+        <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION["user_id"]); ?>">
 
         <label>New password:</label><br>
         <input type="password" name="new_password">
@@ -124,5 +130,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </form>
 </div>
 
+<hr>
+
+<h3>Danger Zone</h3>
+<p>Delete your account permanently.</p>
+
+<form method="POST">
+    <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($_SESSION["user_id"]); ?>">
+    <button type="submit" name="delete_account" value="1">
+        Delete Account
+    </button>
+</form>
 </body>
 </html>

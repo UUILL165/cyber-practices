@@ -1,5 +1,4 @@
 <?php
-//Weak cookie settings.
 ini_set("session.cookie_httponly", 0);
 ini_set("session.cookie_secure", 0);
 ini_set("session.cookie_samesite", "");
@@ -14,14 +13,6 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: signin.php");
     exit();
 }
-
-$current_user_id = $_SESSION["user_id"];
-
-$sql = "SELECT id, username, fullname FROM account WHERE id != ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $current_user_id);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -69,33 +60,29 @@ $result = $stmt->get_result();
             color: #0077b6;
         }
 
+        .card {
+            background: #f0fbff;
+            padding: 18px;
+            border-radius: 10px;
+            border-left: 5px solid #00a8e8;
+            margin-top: 16px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #d9edf7;
         }
 
         th {
-            background: #00a8e8;
-            color: white;
-            padding: 12px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
-
-        .btn {
-            background: #00a8e8;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background: #0077b6;
+            background: #e8f7ff;
+            color: #0077b6;
         }
     </style>
 </head>
@@ -105,34 +92,39 @@ $result = $stmt->get_result();
 
 <div class="container">
     <h1>Home Page</h1>
-    <h2>Your Information</h2>
-    <p><strong>User ID:</strong> <?php echo htmlspecialchars($_SESSION["user_id"]); ?></p>
-    <p><strong>Username:</strong> <?php echo htmlspecialchars($_SESSION["username"]); ?></p>
-    <p><strong>Full name:</strong> <?php echo htmlspecialchars($_SESSION["fullname"]); ?></p>
 
-    <h2>Other Users</h2>
+    <div class="card">
+        <h2>Your Information</h2>
+        <p><strong>User ID:</strong> <?php echo htmlspecialchars($_SESSION["user_id"]); ?></p>
+        <p><strong>Username:</strong> <?php echo htmlspecialchars($_SESSION["username"]); ?></p>
+        <p><strong>Full name:</strong> <?php echo htmlspecialchars($_SESSION["fullname"]); ?></p>
+    </div>
 
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Full Name</th>
-            <th>Profile</th>
-        </tr>
-
-        <?php while ($user = $result->fetch_assoc()): ?>
+    <div class="card">
+        <h2>Users</h2>
+        <table>
             <tr>
-                <td><?php echo htmlspecialchars($user["id"]); ?></td>
-                <td><?php echo htmlspecialchars($user["username"]); ?></td>
-                <td><?php echo htmlspecialchars($user["fullname"]); ?></td>
-                <td>
-                    <a class="btn" href="profile.php?owner=<?php echo urlencode($user["username"]); ?>">
-                        View Profile
-                    </a>
-                </td>
+                <th>ID</th>
+                <th>Username</th>
             </tr>
-        <?php endwhile; ?>
-    </table>
+
+            <?php
+            $users_sql = "SELECT id, username FROM account ORDER BY id ASC";
+            $users_result = $conn->query($users_sql);
+
+            if ($users_result && $users_result->num_rows > 0) {
+                while ($row = $users_result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($row["id"]) . "</td>";
+                    echo "<td>" . htmlspecialchars($row["username"]) . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='2'>No users found.</td></tr>";
+            }
+            ?>
+        </table>
+    </div>
 </div>
 
 </body>

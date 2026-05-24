@@ -99,11 +99,6 @@ $user = $result->fetch_assoc();
         .message {
             color: green;
         }
-
-        .hint {
-            color: #555;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -116,9 +111,7 @@ $user = $result->fetch_assoc();
     <p class="message"><?php echo htmlspecialchars($message); ?></p>
 
     <form method="POST">
-        <label>Target username:</label><br>
-        <input type="text" name="target" value="<?php echo htmlspecialchars($_SESSION["username"]); ?>">
-        <p class="hint">Vulnerable lab field. Changing this allows updating another user's profile.</p>
+        <input type="hidden" name="target" value="<?php echo htmlspecialchars($_SESSION["username"]); ?>">
 
         <label>Edit Profile Page Content:</label><br><br>
         <textarea name="description"><?php echo htmlspecialchars($user["description"]); ?></textarea>

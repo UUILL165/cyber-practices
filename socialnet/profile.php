@@ -1,5 +1,4 @@
 <?php
-// Weak cookie settings
 ini_set("session.cookie_httponly", 0);
 ini_set("session.cookie_secure", 0);
 ini_set("session.cookie_samesite", "");
@@ -29,7 +28,11 @@ if (!$result || $result->num_rows == 0) {
     die("Profile owner not found. SQL error: " . $conn->error);
 }
 
-$user = $result->fetch_assoc();
+$profiles = [];
+while ($row = $result->fetch_assoc()) {
+    $profiles[] = $row;
+}
+$user = $profiles[0];
 ?>
 
 <!DOCTYPE html>
@@ -94,20 +97,24 @@ $user = $result->fetch_assoc();
 <div class="container">
     <h1>Profile Page</h1>
 
-    <p><strong>Owner:</strong> <?php echo htmlspecialchars($user["username"]); ?></p>
-    <p><strong>Full name:</strong> <?php echo htmlspecialchars($user["fullname"]); ?></p>
+    <?php foreach ($profiles as $user): ?>
+        <p><strong>Owner:</strong> <?php echo htmlspecialchars($user["username"]); ?></p>
+        <p><strong>Full name:</strong> <?php echo htmlspecialchars($user["fullname"]); ?></p>
 
-    <h2>Profile Content</h2>
+        <h2>Profile Content</h2>
 
-    <div class="profile-content">
-        <?php
-        if (empty($user["description"])) {
-            echo "This user has no profile content yet.";
-        } else {
-            echo $user["description"];
-        }
-        ?>
-    </div>
+        <div class="profile-content">
+            <?php
+            if (empty($user["description"])) {
+                echo "This user has no profile content yet.";
+            } else {
+                echo $user["description"];
+            }
+            ?>
+        </div>
+        <hr>
+    <?php endforeach; ?>
 </div>
+
 </body>
 </html>
